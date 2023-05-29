@@ -3,7 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
-import * as cookieParser from "cookie-parser";
+import * as session from "express-session";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,10 +12,19 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
-  app.use(cookieParser());
   app.use(helmet());
   // app.enableCors();
   app.enableShutdownHooks();
+  app.use(session({
+    name: "js-backend-sessionid",
+    secret: "ThisIaASuperSecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      maxAge: 60000,
+    }
+  }));
 
   const config = new DocumentBuilder()
     .setTitle("Some API")

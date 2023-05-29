@@ -1,4 +1,6 @@
-import { Controller, Get, Logger, Post, UseGuards, Version, Request, Body, HttpCode, Header } from "@nestjs/common";
+import {
+  Controller, Get, Logger, Post, UseGuards, Version, Request, Body, HttpCode, Header, Inject
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBasicAuth, ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -7,6 +9,8 @@ import { AppService } from "./app.service";
 import { AuthService } from "./auth/auth.service";
 import { Application } from "./entities/application";
 import { UserLogin } from "./auth/dto/user.login";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from 'cache-manager';
 
 @ApiBasicAuth()
 @ApiBearerAuth()
@@ -18,7 +22,8 @@ export class AppController {
     private readonly appService: AppService,
     private readonly authService: AuthService,
     @InjectRepository(Application)
-    private readonly applicationRepository: Repository<Application>
+    private readonly applicationRepository: Repository<Application>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
   @Get()
@@ -50,6 +55,8 @@ export class AppController {
     // this.applicationRepository.createQueryBuilder().where(
     //   "olala = '1'"
     // )
+
+    this.cacheManager
 
     const response = `${this.appService.getHello()} - ${result[1]} - ${result[0]}`;
 

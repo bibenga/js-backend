@@ -13,12 +13,15 @@ import { Application } from "./entities/application";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./auth/auth.module";
+import { CacheModule } from '@nestjs/cache-manager';
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
+    CacheModule.register(),
     TypeOrmModule.forRoot({
       // type: "postgres",
       // host: "db",
@@ -35,6 +38,8 @@ import { AuthModule } from "./auth/auth.module";
       maxQueryExecutionTime: 200,
     }),
     TypeOrmModule.forFeature([DictOperationSystem, Application]),
+    // PassportModule.register({ session: true }),
+    HttpModule,
     PostsModule,
     UserModule,
     AuthModule,
