@@ -13,9 +13,9 @@ export class Category {
   @Column()
   name: string;
 
+  @TreeParent({onDelete: "CASCADE"})
+  parent: Category;
+
   @TreeChildren()
   children: Category[];
-
-  @TreeParent()
-  parent: Category;
 }
