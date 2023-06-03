@@ -5,7 +5,7 @@ import { Profile } from "../entities/profile";
 import { User } from "../entities/user";
 import { PaginatedDto } from "../pagination.dto";
 import { DataSource, Repository } from "typeorm";
-import { CreateUserDto, UserDto } from "./user.dto";
+import { CreateUserDto, UpdateUserDto, UserDto } from "./user.dto";
 
 @Injectable()
 export class UserService {
@@ -132,8 +132,13 @@ export class UserService {
     return null;
   }
 
-  async update(id: string, user: UserDto): Promise<UserDto | null> {
-    return user;
+  async update(id: string, user: UpdateUserDto): Promise<UserDto | null> {
+    return {
+      id: id,
+      email: "",
+      firstName: user?.firstName,
+      lastName: user?.lastName
+    }
   }
 
   async remove(id: string) {

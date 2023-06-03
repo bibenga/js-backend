@@ -5,7 +5,7 @@ import {
   ApiBasicAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse,
   ApiOkResponse, ApiTags, ApiUnauthorizedResponse, getSchemaPath, ApiQuery, ApiExtraModels
 } from "@nestjs/swagger";
-import { UserDto, CreateUserDto, PaginatedUserDto } from "./user.dto";
+import { UserDto, CreateUserDto, PaginatedUserDto, UpdateUserDto, AuthenticationUserDto } from "./user.dto";
 import { UserService } from "./user.service";
 
 @ApiBasicAuth()
@@ -17,12 +17,12 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Get("me")
-  @ApiOkResponse({ type: UserDto, description: "Ok." })
-  async me(): Promise<UserDto | null> {
-    const u: UserDto = {
+  @ApiOkResponse({ type: AuthenticationUserDto, description: "Ok." })
+  async me(): Promise<AuthenticationUserDto | null> {
+    const u: AuthenticationUserDto = {
       id: "",
+      email: "",
       isAuthenticated: false,
-      email: ""
     }
     return u
   }
@@ -78,7 +78,7 @@ export class UserController {
   @ApiNotFoundResponse({ description: "Not Found." })
   async update(
     @Param("id") id: string,
-    @Body() updateUserDto: UserDto
+    @Body() updateUserDto: UpdateUserDto
   ): Promise<UserDto | null> {
     return await this.userService.update(id, updateUserDto);
   }
