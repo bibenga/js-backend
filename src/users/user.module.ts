@@ -5,11 +5,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../entities/user";
 import { UserSubscriber } from "./user.subscriber";
 import { Category } from "../entities/category";
+import { Profile } from "../entities/profile";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([Category]),
+    TypeOrmModule.forFeature([User, Profile, Category]),
   ],
   controllers: [UserController],
   providers: [UserService, UserSubscriber],

@@ -1,12 +1,9 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { PostsModule } from "./posts/posts.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "./entities/user";
 import { UserModule } from "./users/user.module";
-import { Category } from "./entities/category";
-import { Profile } from "./entities/profile";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { DictOperationSystem } from "./entities/dict_operation_system";
 import { Application } from "./entities/application";
@@ -15,6 +12,8 @@ import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./auth/auth.module";
 import { CacheModule } from '@nestjs/cache-manager';
 import { HttpModule } from "@nestjs/axios";
+import { PassportModule } from "@nestjs/passport";
+import { AccessLoggerMiddleware } from "./accesslogger";
 
 @Module({
   imports: [
@@ -36,10 +35,11 @@ import { HttpModule } from "@nestjs/axios";
       synchronize: process.env.DB_SYNCRONIZE === 'true',
       maxQueryExecutionTime: Number(process.env.DB_MAX_QUERY_EXECUTION_TIME),
 
-      entities: [User, Profile, Category, DictOperationSystem, Application],
+      autoLoadEntities: true,
+      // entities: [User, Profile, Category, DictOperationSystem, Application],
     }),
     TypeOrmModule.forFeature([DictOperationSystem, Application]),
-    // PassportModule.register({ session: true }),
+    PassportModule.register({ session: true }),
     HttpModule,
     PostsModule,
     UserModule,
@@ -48,4 +48,8 @@ import { HttpModule } from "@nestjs/axios";
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(AccessLoggerMiddleware).forRoutes('*');
+  }
+}
