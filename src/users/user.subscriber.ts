@@ -15,6 +15,7 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 
   beforeInsert(event: InsertEvent<User>) {
     console.log(`BEFORE USER INSERTED: `, event.entity);
+    event.entity.email = event.entity.email.toLowerCase()
   }
 
   beforeUpdate(event: UpdateEvent<User>) {

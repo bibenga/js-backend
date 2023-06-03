@@ -2,6 +2,9 @@ import {
   Entity, Column, PrimaryGeneratedColumn, VersionColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn,
   Index, OneToOne, VirtualColumn,
 } from "typeorm";
+import {
+  IsEmail,
+} from "class-validator"
 import { Profile } from "./profile";
 
 @Entity({ orderBy: { id: "ASC" } })
@@ -9,18 +12,16 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ name: "username", comment: "User login" })
+  @Column({ name: "email", comment: "User login" })
   @Index({
     unique: true,
     where: "deleted IS NULL",
   })
-  username: string;
+  @IsEmail()
+  email: string;
 
-  @Column({ name: "first_name", nullable: true })
-  firstName: string;
-
-  @Column({ name: "last_name", nullable: true })
-  lastName: string;
+  @Column({ select: false })
+  password: string;
 
   @Column({ name: "is_active", default: true })
   isActive: boolean;
@@ -47,13 +48,8 @@ export class User {
   profile: Profile;
 
   @VirtualColumn({
+    type: "boolean",
     query: alias => `EXISTS(select * from "profile" WHERE "user_id" = ${alias}.id)`,
   })
   isProfileExists: boolean;
-
-  @Column({ default: 1 })
-  age: Number;
-
-  @Column({ select: false })
-  password: string;
 }

@@ -3,23 +3,36 @@ import {
 } from "@nestjs/common";
 import {
   ApiBasicAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse,
-  ApiOkResponse, ApiTags, ApiUnauthorizedResponse, getSchemaPath, ApiQuery,
+  ApiOkResponse, ApiTags, ApiUnauthorizedResponse, getSchemaPath, ApiQuery, ApiExtraModels
 } from "@nestjs/swagger";
-import { PaginatedDto } from "../pagination.dto";
-import { UserDto, CreateUserDto } from "./user.dto";
+import { UserDto, CreateUserDto, PaginatedUserDto } from "./user.dto";
 import { UserService } from "./user.service";
 
 @ApiBasicAuth()
 @ApiTags("users")
 @Controller({ path: "users", version: "2" })
+@ApiUnauthorizedResponse({ description: "Unauthorized." })
+@ApiForbiddenResponse({ description: "Forbidden." })
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
+  @Get("me")
+  @ApiOkResponse({ type: UserDto, description: "Ok." })
+  async me(): Promise<UserDto | null> {
+    const u: UserDto = {
+      id: "",
+      isAuthenticated: false,
+      email: ""
+    }
+    return u
+  }
+
   @Get()
+  @ApiExtraModels(PaginatedUserDto)
   @ApiOkResponse({
     schema: {
       allOf: [
-        { $ref: getSchemaPath(PaginatedDto) },
+        { $ref: getSchemaPath(PaginatedUserDto) },
         {
           properties: {
             results: {
@@ -31,12 +44,13 @@ export class UserController {
       ],
     },
   })
+  // @ApiOkResponse({ type: PaginatedUserDto, description: "Ok." })
   @ApiQuery({ name: "id", required: false, type: "number", isArray: true })
   @ApiQuery({ name: "isActive", required: false, type: "boolean" })
   async findAll(
     @Query("id") ids?: number[],
     @Query("isActive") isActive?: boolean
-  ): Promise<PaginatedDto<UserDto>> {
+  ): Promise<PaginatedUserDto> {
     return this.userService.list();
   }
 
@@ -52,21 +66,26 @@ export class UserController {
     type: UserDto,
     description: "The record has been successfully created.",
   })
-  @ApiUnauthorizedResponse({ description: "Unauthorized." })
-  @ApiForbiddenResponse({ description: "Forbidden." })
-  @ApiNotFoundResponse({ description: "Not Found." })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserDto | null> {
-    return this.userService.create(createUserDto);
+    return await this.userService.create(createUserDto);
   }
 
   @Patch(":id")
+  @ApiCreatedResponse({
+    type: UserDto,
+    description: "The record has been successfully updated.",
+  })
+  @ApiNotFoundResponse({ description: "Not Found." })
   async update(
-    @Param("id") id: number,
+    @Param("id") id: string,
     @Body() updateUserDto: UserDto
-  ): Promise<UserDto> {
-    return updateUserDto;
+  ): Promise<UserDto | null> {
+    return await this.userService.update(id, updateUserDto);
   }
 
   @Delete(":id")
-  async remove(@Param("id") id: string) { }
+  @ApiNotFoundResponse({ description: "Not Found." })
+  async remove(@Param("id") id: string) {
+    await this.userService.remove(id);
+  }
 }

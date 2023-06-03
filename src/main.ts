@@ -19,22 +19,22 @@ async function bootstrap() {
     name: "js-backend-sessionid",
     secret: "ThisIaASuperSecret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: true,
       maxAge: 60000,
     }
   }));
 
-  const config = new DocumentBuilder()
-    .setTitle("Some API")
-    .setDescription("Some API description")
+  const docConfig = new DocumentBuilder()
+    .setTitle("Unnecessary API")
+    .setDescription("Unnecessary API description")
     .setVersion("1.0")
     .addBasicAuth()
     .addBearerAuth()
-    .addApiKey({ name: "X-Olala-Key", type: "apiKey" })
+    .addApiKey({ name: "X-Unnecessary-Key", type: "apiKey" })
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, docConfig);
   SwaggerModule.setup("api", app, document);
 
   await app.listen(3000);

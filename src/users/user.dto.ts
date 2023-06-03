@@ -1,10 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
+import { PaginatedDto } from "src/pagination.dto";
 
 export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
-  login: string;
+  email: string;
+
+  @ApiProperty({ writeOnly: true })
+  @IsNotEmpty()
+  password: string;
 
   @ApiPropertyOptional()
   firstName?: string;
@@ -15,14 +20,21 @@ export class CreateUserDto {
 
 export class UserDto {
   @ApiProperty({ readOnly: true })
-  userId: number;
+  id: string;
 
   @ApiProperty({ readOnly: true })
-  login: string;
+  isAuthenticated: boolean
+
+  @ApiProperty({ readOnly: true })
+  email: string;
 
   @ApiPropertyOptional()
+  @IsNotEmpty()
   firstName?: string;
 
   @ApiPropertyOptional()
+  @IsNotEmpty()
   lastName?: string;
 }
+
+export class PaginatedUserDto extends PaginatedDto<UserDto> {}

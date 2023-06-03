@@ -47,7 +47,7 @@ export class UserService {
         //   profile: true,
         // },
         where: {
-          username: "1",
+          email: "1",
         },
         lock: {
           mode: "pessimistic_write",
@@ -82,7 +82,7 @@ export class UserService {
         profile.photo += "1";
         await manager.save(profile);
       }
-      user.lastName += "1";
+      // user.lastName += "1";
       // user.meta.ip = "123";
       await manager.save(user);
 
@@ -128,15 +128,15 @@ export class UserService {
     };
   }
 
-  create(user: CreateUserDto): UserDto | null {
+  async create(user: CreateUserDto): Promise<UserDto | null> {
     return null;
   }
 
-  update(user: UserDto): UserDto | null {
-    return null;
+  async update(id: string, user: UserDto): Promise<UserDto | null> {
+    return user;
   }
 
-  remove(arg0: number) {
+  async remove(id: string) {
     throw new Error("Method not implemented.");
   }
 
