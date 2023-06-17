@@ -1,23 +1,25 @@
-import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
 import * as session from "express-session";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ["debug"],
   });
 
+  app.enableShutdownHooks();
+  app.disable('x-powered-by')
   app.useGlobalPipes(new ValidationPipe());
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
   app.use(helmet());
   // app.enableCors();
-  app.enableShutdownHooks();
   app.use(session({
     name: "js-backend-sessionid",
-    secret: "ThisIaASuperSecret",
+    secret: "ThisIsASuperSecret",
     resave: false,
     saveUninitialized: true,
     cookie: {

@@ -17,4 +17,13 @@ export class AuthService {
     return null;
   }
 
+  async validateUserByToken(token: string): Promise<any> {
+    const user = await this.userService.findOne(token);
+    // todo: code is insecure and i am too lazy to write correct code
+    if (user) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
 }

@@ -2,7 +2,7 @@ import {
   Controller, Get, Logger, Post, UseGuards, Version, Request, Body, HttpCode, Header, Inject
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBasicAuth, ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
+import { ApiBasicAuth, ApiBearerAuth, ApiOkResponse, ApiHeader } from "@nestjs/swagger";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { AppService } from "./app.service";
@@ -12,8 +12,6 @@ import { UserLogin } from "./auth/dto/user.login";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from 'cache-manager';
 
-@ApiBasicAuth()
-@ApiBearerAuth()
 @Controller("olala")
 export class AppController {
   private readonly logger = new Logger(AppController.name);
@@ -63,18 +61,50 @@ export class AppController {
     return response;
   }
 
-  @UseGuards(AuthGuard("local"))
-  @Post("localLogin")
+  @ApiBasicAuth()
+  // @UseGuards(AuthGuard("basic"))
+  @Get("basicLogin")
   @HttpCode(200)
-  async localLogin(@Request() req, @Body() loginRequest: UserLogin) {
+  async basicLogin(@Request() req) {
     // const user = await this.authService.login(loginRequest.username, loginRequest.password);
+    this.logger.log(`[basicLogin] ${req.user}`)
     return req.user;
   }
 
-  @UseGuards(AuthGuard("basic"))
-  @Post("basicLogin")
+  // @ApiBasicAuth()
+  // @UseGuards(AuthGuard("local"))
+  @Post("formLogin")
   @HttpCode(200)
-  async basicLogin(@Request() req) {
+  async formLogin(@Request() req, @Body() loginRequest: UserLogin) {
+    this.logger.log(`[formLogin] -> ${loginRequest}`)
+    // const user = await this.authService.login(loginRequest.username, loginRequest.password);
+    this.logger.log(`[formLogin] ${req.user}`)
+    return req.user;
+  }
+
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard("bearer"))
+  @Get("bearerLogin")
+  @HttpCode(200)
+  async bearerLogin(@Request() req) {
+    this.logger.log(`[bearerLogin] ${req.user}`)
+    return req.user;
+  }
+
+  @ApiHeader({name: "apiKey"})
+  // @UseGuards(AuthGuard("apiKey"))
+  @Get("tokenLogin")
+  @HttpCode(200)
+  async tokenLogin(@Request() req) {
+    this.logger.log(`[tokenLogin] ${req.user}`)
+    return req.user;
+  }
+
+  // @UseGuards(AuthGuard("local"), AuthGuard("basic"), AuthGuard("bearer"))
+  @Get("secreto")
+  @HttpCode(200)
+  async secreto(@Request() req) {
+    this.logger.log(`[secreto] ${req.user}`)
     return req.user;
   }
 }
