@@ -82,7 +82,7 @@ export class AppController {
     return req.user;
   }
 
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   // @UseGuards(AuthGuard("bearer"))
   @Get("bearerLogin")
   @HttpCode(200)
@@ -91,12 +91,15 @@ export class AppController {
     return req.user;
   }
 
-  @ApiHeader({name: "apiKey"})
-  // @UseGuards(AuthGuard("apiKey"))
+  // @ApiBearerAuth()
+  @ApiHeader({name: "X-Unnecessary-Key"})
+  // @ApiHeader({name: "Authorization"})
+  @UseGuards(AuthGuard("api-key"))
   @Get("tokenLogin")
   @HttpCode(200)
   async tokenLogin(@Request() req) {
-    this.logger.log(`[tokenLogin] ${req.user}`)
+    console.log(req.headers)
+    this.logger.log(`[tokenLogin] ${req.headers['x-unnecessary-key']}`)
     return req.user;
   }
 
