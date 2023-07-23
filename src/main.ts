@@ -5,10 +5,29 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
 import * as session from "express-session";
+import { createLogger, transports, format } from "winston";
+import { WinstonModule } from "nest-winston";
 
 async function bootstrap() {
+
+  const logger = createLogger({
+    transports: [
+      new transports.Console({ level: 'info' })
+    ],
+    format: format.combine(
+      format.colorize(),
+      format.timestamp(),
+      format.align(),
+      format.errors({ stack: true }),
+      format.printf(({ timestamp, level, message }) => {
+        return `[${timestamp}] ${level}: ${message}`;
+      }),
+    ),
+  })
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ["debug"],
+    // logger: ['debug']
+    logger: WinstonModule.createLogger({ instance: logger }),
   });
 
   app.enableShutdownHooks();

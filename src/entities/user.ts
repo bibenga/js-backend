@@ -1,6 +1,6 @@
 import {
   Entity, Column, PrimaryGeneratedColumn, VersionColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn,
-  Index, OneToOne, VirtualColumn,
+  Index, OneToOne, VirtualColumn, BaseEntity,
 } from "typeorm";
 import {
   IsEmail,
@@ -8,7 +8,7 @@ import {
 import { Profile } from "./profile";
 
 @Entity({ orderBy: { id: "ASC" } })
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
